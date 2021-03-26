@@ -37,14 +37,25 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
           // Turn LED1 On/Off for Caps Lock
           if (CAPS_LED) {
             ergodox_right_led_3_off();
+            ergodox_board_led_off();
             CAPS_LED = false;
           } else {
             ergodox_right_led_3_on();
+            ergodox_board_led_on();
             CAPS_LED = true;
           }
         }
         return true;
-        break;
+
+      // For vim: turn down caps lock at esc
+      case KC_ESC:
+        if (CAPS_LED) {
+            tap_code(KC_CAPS);
+            ergodox_right_led_3_off();
+            ergodox_board_led_off();
+            CAPS_LED = false;
+        }
+        return true;
     }
     return true;
 };
