@@ -32,21 +32,6 @@ void drive_led(uint8_t l) {
 
 bool process_record_user(uint16_t keycode, keyrecord_t *record) {
     switch (keycode) {
-      case KC_CAPS:
-        if (record->event.pressed) {
-          // Turn LED1 On/Off for Caps Lock
-          if (CAPS_LED) {
-            ergodox_right_led_3_off();
-            ergodox_board_led_off();
-            CAPS_LED = false;
-          } else {
-            ergodox_right_led_3_on();
-            ergodox_board_led_on();
-            CAPS_LED = true;
-          }
-        }
-        return true;
-
       // For vim: turn down caps lock at esc
       case KC_ESC:
         if (CAPS_LED) {
@@ -62,6 +47,17 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
 
 // Runs constantly in the background, in a loop.
 void matrix_scan_user(void) {
+
+    led_t leds = host_keyboard_led_state();
+    if (leds.caps_lock) {
+        ergodox_right_led_3_on();
+        ergodox_board_led_on();
+        CAPS_LED = true;
+    } else {
+        ergodox_right_led_3_off();
+        ergodox_board_led_off();
+        CAPS_LED = false;
+    }
 
     uint8_t layer = biton32(layer_state);
 
@@ -80,12 +76,3 @@ void matrix_scan_user(void) {
     }
 
 };
-
-/* bool led_update_user(led_t led_state) { */
-/*     if (led_state.num_lock) { */
-/*         ergodox_right_led_3_on(); */
-/*     } else { */
-/*         ergodox_right_led_3_off(); */
-/*     } */
-/*     return true; */
-/* } */
