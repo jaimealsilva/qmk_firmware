@@ -6,10 +6,6 @@
 #define LEDC_S 1
 uint8_t ledc[2];
 
-/* false: Caps Lock LED is off
-   true: Caps Lock LED is on */
-bool CAPS_LED = false;
-
 // Runs just one time when the keyboard initializes.
 void matrix_init_user(void) {
     ergodox_led_all_off();
@@ -31,14 +27,13 @@ void drive_led(uint8_t l) {
 }
 
 bool process_record_user(uint16_t keycode, keyrecord_t *record) {
+    led_t leds;
     switch (keycode) {
       // For vim: turn down caps lock at esc
       case KC_ESC:
-        if (CAPS_LED) {
+        leds = host_keyboard_led_state();
+        if (leds.caps_lock) {
             tap_code(KC_CAPS);
-            ergodox_right_led_3_off();
-            ergodox_board_led_off();
-            CAPS_LED = false;
         }
         return true;
     }
@@ -50,25 +45,23 @@ void matrix_scan_user(void) {
 
     led_t leds = host_keyboard_led_state();
     if (leds.caps_lock) {
-        ergodox_right_led_3_on();
+        ergodox_right_led_2_on();
         ergodox_board_led_on();
-        CAPS_LED = true;
     } else {
-        ergodox_right_led_3_off();
+        ergodox_right_led_2_off();
         ergodox_board_led_off();
-        CAPS_LED = false;
     }
 
     uint8_t layer = biton32(layer_state);
 
     ergodox_right_led_1_off();
-    ergodox_right_led_2_off();
+    ergodox_right_led_3_off();
     switch (layer) {
         case 1:
-            drive_led(1);
+            ergodox_right_led_1_on();
             break;
         case 2:
-            drive_led(2);
+            ergodox_right_led_3_on();
             break;
         default:
             // none
